@@ -1,3 +1,4 @@
+import 'package:expensync/app/app.dart';
 import 'package:expensync/modules/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,122 +20,117 @@ class HomeView extends StatelessWidget {
       body: NestedScrollView(
         floatHeaderSlivers: true,
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
-          SliverAppBar(
-            pinned: true,
-            floating: true,
-            snap: true,
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Expensync',
-                      style: themeData.textTheme.titleLarge,
+          BlocSelector<HomeCubit, HomeState, int>(
+            selector: (state) => state.tabIndex,
+            builder: (context, tabIndex) {
+              return SliverAppBar(
+                pinned: true,
+                floating: true,
+                snap: true,
+                actions: [
+                  if (tabIndex == 0)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          visualDensity: VisualDensity.compact,
+                          onPressed: selectionEnabled
+                              ? expensesCubit.removeAllSelectedExpense
+                              : null,
+                          icon: const Icon(Icons.delete_forever_rounded),
+                        ),
+                        IconButton(
+                          visualDensity: VisualDensity.compact,
+                          onPressed: selectionEnabled
+                              ? expensesCubit.deselectAll
+                              : null,
+                          icon: const Icon(Icons.deselect),
+                        ),
+                        const SizedBox(width: 10),
+                      ],
                     ),
-                    Text(
-                      'Minimal Expense Manager',
-                      style: themeData.textTheme.titleSmall?.copyWith(
-                        color: themeData.textTheme.titleSmall?.color
-                            ?.withOpacity(.5),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    // if (online)
-                    const Icon(
-                      Icons.wifi_rounded,
-                      color: Colors.green,
-                    ),
-                    // else
-                    // Icon(
-                    //   Icons.wifi_off_rounded,
-                    //   color: Colors.red,
-                    // ),
-                    const SizedBox(width: 10),
-                    Text(
-                      'Connection',
-                      style: themeData.textTheme.titleMedium,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(kToolbarHeight),
-              child: ListTile(
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      visualDensity: VisualDensity.compact,
-                      onPressed: selectionEnabled
-                          ? expensesCubit.removeAllSelectedExpense
-                          : null,
-                      icon: const Icon(Icons.delete_forever_rounded),
-                    ),
-                    IconButton(
-                      visualDensity: VisualDensity.compact,
-                      onPressed:
-                          selectionEnabled ? expensesCubit.deselectAll : null,
-                      icon: const Icon(Icons.deselect),
-                    ),
-                  ],
-                ),
+                ],
                 title: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Sync status: ',
-                      style: themeData.textTheme.titleMedium,
-                    ),
-                    Row(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text.rich(
-                          style: themeData.textTheme.titleLarge
-                              ?.copyWith(color: Colors.blue),
-                          TextSpan(
-                            text: '0',
-                            children: [
-                              TextSpan(
-                                text: ' Pending',
-                                style:
-                                    themeData.textTheme.titleMedium?.copyWith(
-                                  color: themeData.textTheme.titleMedium?.color,
-                                ),
-                                children: const [],
-                              ),
-                            ],
-                          ),
+                        Text(
+                          'Expensync',
+                          style: themeData.textTheme.titleLarge,
                         ),
-                        const SizedBox(width: 15),
-                        Text.rich(
-                          style: themeData.textTheme.titleLarge
-                              ?.copyWith(color: Colors.blue),
-                          TextSpan(
-                            text: '0',
-                            children: [
-                              TextSpan(
-                                text: ' Items',
-                                style:
-                                    themeData.textTheme.titleMedium?.copyWith(
-                                  color: themeData.textTheme.titleMedium?.color,
-                                ),
-                                children: const [],
-                              ),
-                            ],
+                        Text(
+                          'Minimal Expense Manager',
+                          style: themeData.textTheme.titleSmall?.copyWith(
+                            color: themeData.textTheme.titleSmall?.color
+                                ?.withOpacity(.5),
                           ),
                         ),
                       ],
                     ),
                   ],
                 ),
-              ),
-            ),
+                bottom: PreferredSize(
+                  preferredSize: const Size.fromHeight(kToolbarHeight),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 7.5,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Status: ',
+                          style: themeData.textTheme.titleMedium,
+                        ),
+                        const SizedBox(width: 5),
+                        BlocSelector<AppCubit, AppState, bool>(
+                          selector: (state) => state.online,
+                          builder: (context, online) {
+                            return Row(
+                              children: [
+                                if (online)
+                                  const Icon(
+                                    Icons.sync_outlined,
+                                    color: Colors.green,
+                                  )
+                                else
+                                  const Icon(
+                                    Icons.sync_problem_rounded,
+                                    color: Colors.red,
+                                  ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  'Syncing...',
+                                  style: themeData.textTheme.titleMedium,
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        const Spacer(),
+                        Column(
+                          children: [
+                            Text(
+                              'Pending:',
+                              style: themeData.textTheme.labelMedium,
+                            ),
+                            Text(
+                              '0',
+                              style: themeData.textTheme.labelMedium
+                                  ?.copyWith(color: Colors.blue),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         ],
         body: BlocSelector<HomeCubit, HomeState, int>(
