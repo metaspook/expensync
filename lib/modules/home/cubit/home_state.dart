@@ -10,6 +10,7 @@ class HomeState extends Equatable {
     this.pendingCount = 0,
     this.itemCount = 0,
     this.connected = false,
+    this.deleteEnabled = false,
   });
 
   final HomeStatus status;
@@ -18,6 +19,7 @@ class HomeState extends Equatable {
   final int pendingCount;
   final int itemCount;
   final bool connected;
+  final bool deleteEnabled;
 
   HomeState copyWith({
     HomeStatus? status,
@@ -26,6 +28,7 @@ class HomeState extends Equatable {
     int? pendingCount,
     int? itemCount,
     bool? connected,
+    bool? deleteEnabled,
   }) {
     return HomeState(
       status: status ?? this.status,
@@ -34,6 +37,7 @@ class HomeState extends Equatable {
       pendingCount: pendingCount ?? this.pendingCount,
       itemCount: itemCount ?? this.itemCount,
       connected: connected ?? this.connected,
+      deleteEnabled: deleteEnabled ?? this.deleteEnabled,
     );
   }
 
@@ -46,6 +50,7 @@ class HomeState extends Equatable {
       pendingCount,
       itemCount,
       connected,
+      deleteEnabled,
     ];
   }
 }

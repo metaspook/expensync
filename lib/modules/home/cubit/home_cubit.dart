@@ -9,4 +9,8 @@ class HomeCubit extends Cubit<HomeState> {
   void changeTab(int index) {
     emit(state.copyWith(tabIndex: index));
   }
+
+  void changeDeleteEnabled({required bool value}) {
+    emit(state.copyWith(deleteEnabled: value));
+  }
 }
