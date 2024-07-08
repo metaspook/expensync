@@ -33,6 +33,8 @@ class ExpensesState extends Equatable {
   final List<Expense> expenses;
   final List<Expense> selectedExpenses;
 
+  bool get selectionEnabled => selectedExpenses.isNotEmpty;
+
   Map<String, dynamic> toJson() =>
       <String, dynamic>{'expenses': expenses.map((e) => e.toJson()).toList()};
 

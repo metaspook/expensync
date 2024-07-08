@@ -9,8 +9,10 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = ThemeData(
       useMaterial3: true,
-      colorScheme:
-          ColorScheme.fromSeed(seedColor: Colors.pink, primary: Colors.indigo),
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: Colors.pink,
+        primary: Colors.indigo,
+      ),
     );
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -18,9 +20,9 @@ class App extends StatelessWidget {
         appBarTheme: AppBarTheme(
           backgroundColor: theme.colorScheme.inversePrimary.withOpacity(.75),
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(15),
-              bottom: Radius.circular(15),
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(15),
+              bottomRight: Radius.circular(15),
             ),
           ),
         ),

@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-class Expense extends Equatable {
+final class Expense extends Equatable {
   const Expense({
     required this.id,
     required this.amount,
@@ -44,5 +44,21 @@ class Expense extends Equatable {
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
+  }
+
+  Expense copyWith({
+    String? id,
+    String? name,
+    num? amount,
+    String? createdAt,
+    String? updatedAt,
+  }) {
+    return Expense(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      amount: amount ?? this.amount,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
   }
 }

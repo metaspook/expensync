@@ -21,14 +21,34 @@ class ExpensesCubit extends HydratedCubit<ExpensesState> {
     emit(state.copyWith(expenses: newExpenses));
   }
 
-  void updateExpense(Expense expense) {
-    emit(state.copyWith(expenses: [...state.expenses, expense]));
+  void updateExpense(int index, Expense expense) {
+    final newExpenses = [...state.expenses]..[index] = expense;
+    emit(state.copyWith(expenses: newExpenses));
+  }
+
+  void deselectAll() {
+    emit(state.copyWith(selectedExpenses: []));
+  }
+
+  void removeAllSelectedExpense() {
+    final newExpenses = [...state.expenses];
+    for (final expense in state.selectedExpenses) {
+      newExpenses.removeWhere((current) => current == expense);
+    }
+
+    emit(state.copyWith(expenses: newExpenses, selectedExpenses: []));
   }
 
   void selectExpense(Expense expense) {
     emit(
-      state.copyWith(selectedExpenses: [...state.selectedExpenses, expense]),
+      state.selectedExpenses.contains(expense)
+          ? state.copyWith(
+              selectedExpenses: [...state.selectedExpenses]..remove(expense),
+            )
+          : state
+              .copyWith(selectedExpenses: [...state.selectedExpenses, expense]),
     );
+    print(state.selectedExpenses);
   }
 
   @override

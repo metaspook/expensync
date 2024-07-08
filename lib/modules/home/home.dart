@@ -1,4 +1,10 @@
 export 'cubit/home_cubit.dart';
+export 'expense_entry/cubit/expense_entry_cubit.dart';
+export 'expense_entry/view/expense_entry_view.dart';
+export 'expense_report/cubit/expense_report_cubit.dart';
+export 'expense_report/view/expense_report_view.dart';
 export 'expenses/cubit/expenses_cubit.dart';
 export 'expenses/view/expenses_view.dart';
 export 'view/home_page.dart';
+export 'view/home_view.dart';
+export 'widgets/expense_edit_dialog.dart';

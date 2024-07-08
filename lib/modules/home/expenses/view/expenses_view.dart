@@ -11,8 +11,12 @@ class ExpensesView extends StatelessWidget {
     final cubit = context.read<ExpensesCubit>();
     final expenses =
         context.select((ExpensesCubit cubit) => cubit.state.expenses);
+    final selectedExpenses =
+        context.select((ExpensesCubit cubit) => cubit.state.selectedExpenses);
     final isLoading =
         context.select((ExpensesCubit cubit) => cubit.state.status.isLoading);
+    final selectionEnabled =
+        context.select((ExpensesCubit cubit) => cubit.state.selectionEnabled);
 
     return isLoading
         ? const Center(child: CircularProgressIndicator())
@@ -28,9 +32,18 @@ class ExpensesView extends StatelessWidget {
                 physics: const BouncingScrollPhysics(),
                 itemCount: expenses.length,
                 itemBuilder: (context, index) {
-                  final expense = expenses[index];
+                  final expense = expenses[expenses.length - 1 - index];
+                  final selected = selectedExpenses.contains(expense);
                   return Card(
                     child: ListTile(
+                      selectedTileColor: themeData.primaryColorLight,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      selected: selected,
+                      onTap: selectionEnabled
+                          ? () => cubit.selectExpense(expense)
+                          : null,
                       onLongPress: () => cubit.selectExpense(expense),
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -47,27 +60,16 @@ class ExpensesView extends StatelessWidget {
                             '\$${expense.amount}',
                             style: themeData.textTheme.bodyLarge,
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                visualDensity: const VisualDensity(
-                                  horizontal: VisualDensity.minimumDensity,
-                                  vertical: VisualDensity.minimumDensity,
-                                ),
-                                onPressed: () {},
-                                icon: const Icon(Icons.edit_rounded),
-                              ),
-                              IconButton(
-                                visualDensity: const VisualDensity(
-                                  horizontal: VisualDensity.minimumDensity,
-                                  vertical: VisualDensity.minimumDensity,
-                                ),
-                                onPressed: () {},
-                                icon: const Icon(Icons.delete_forever_rounded),
-                              ),
-                            ],
+                          IconButton(
+                            visualDensity: const VisualDensity(
+                              horizontal: VisualDensity.minimumDensity,
+                              vertical: VisualDensity.minimumDensity,
+                            ),
+                            onPressed: selectionEnabled
+                                ? null
+                                : () => ExpenseEditDialog(expense)
+                                    .show(context, cubit: cubit),
+                            icon: const Icon(Icons.edit_rounded),
                           ),
                         ],
                       ),

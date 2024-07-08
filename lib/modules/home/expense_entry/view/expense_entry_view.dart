@@ -65,9 +65,10 @@ class _ExpenseEntryViewState extends State<ExpenseEntryView> {
         // Name Field
         TextField(
           controller: _nameController,
-          decoration: const InputDecoration(
-            label: Text('Name'),
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            label: const Text('Name'),
+            border:
+                OutlineInputBorder(borderRadius: BorderRadius.circular(12.5)),
           ),
         ),
         const SizedBox(height: 20),
@@ -75,9 +76,10 @@ class _ExpenseEntryViewState extends State<ExpenseEntryView> {
         TextField(
           keyboardType: TextInputType.number,
           controller: _amountController,
-          decoration: const InputDecoration(
-            label: Text('Amount'),
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            label: const Text('Amount'),
+            border:
+                OutlineInputBorder(borderRadius: BorderRadius.circular(12.5)),
           ),
         ),
         const SizedBox(height: 20),

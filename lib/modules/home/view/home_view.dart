@@ -1,5 +1,3 @@
-import 'package:expensync/modules/home/expense_entry/view/expense_entry_view.dart';
-import 'package:expensync/modules/home/expense_report/view/expense_report_view.dart';
 import 'package:expensync/modules/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,8 +9,11 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
     final cubit = context.read<HomeCubit>();
+    final expensesCubit = context.read<ExpensesCubit>();
     // final appCubit = context.read<AppCubit>();
     // final repo = context.read<TodoRepo>();
+    final selectionEnabled =
+        context.select((ExpensesCubit cubit) => cubit.state.selectionEnabled);
 
     return Scaffold(
       body: NestedScrollView(
@@ -66,6 +67,24 @@ class HomeView extends StatelessWidget {
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(kToolbarHeight),
               child: ListTile(
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      onPressed: selectionEnabled
+                          ? expensesCubit.removeAllSelectedExpense
+                          : null,
+                      icon: const Icon(Icons.delete_forever_rounded),
+                    ),
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      onPressed:
+                          selectionEnabled ? expensesCubit.deselectAll : null,
+                      icon: const Icon(Icons.deselect),
+                    ),
+                  ],
+                ),
                 title: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -129,30 +148,40 @@ class HomeView extends StatelessWidget {
           },
         ),
       ),
-      bottomNavigationBar: BlocSelector<HomeCubit, HomeState, int>(
-        selector: (state) => state.tabIndex,
-        builder: (context, tabIndex) {
-          return BottomNavigationBar(
-            currentIndex: tabIndex,
-            onTap: (index) {
-              if (index != tabIndex) cubit.changeTab(index);
-            },
-            items: const [
-              BottomNavigationBarItem(
-                label: 'Expenses',
-                icon: Icon(Icons.library_books_rounded),
-              ),
-              BottomNavigationBarItem(
-                label: 'Add Entry',
-                icon: Icon(Icons.library_add_rounded),
-              ),
-              BottomNavigationBarItem(
-                label: 'Report',
-                icon: Icon(Icons.receipt_outlined),
-              ),
-            ],
-          );
-        },
+      extendBody: true,
+      bottomNavigationBar: ClipRRect(
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(15),
+          topRight: Radius.circular(15),
+        ),
+        clipBehavior: Clip.hardEdge,
+        child: BlocSelector<HomeCubit, HomeState, int>(
+          selector: (state) => state.tabIndex,
+          builder: (context, tabIndex) {
+            return BottomNavigationBar(
+              backgroundColor:
+                  themeData.colorScheme.inversePrimary.withOpacity(.875),
+              currentIndex: tabIndex,
+              onTap: (index) {
+                if (index != tabIndex) cubit.changeTab(index);
+              },
+              items: const [
+                BottomNavigationBarItem(
+                  label: 'Expenses',
+                  icon: Icon(Icons.library_books_rounded),
+                ),
+                BottomNavigationBarItem(
+                  label: 'Add Entry',
+                  icon: Icon(Icons.library_add_rounded),
+                ),
+                BottomNavigationBarItem(
+                  label: 'Report',
+                  icon: Icon(Icons.receipt_outlined),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
