@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:expensync/shared/models/models.dart';
 import 'package:expensync/shared/repositories/repositories.dart';
@@ -9,9 +11,15 @@ part 'expenses_state.dart';
 class ExpensesCubit extends HydratedCubit<ExpensesState> {
   ExpensesCubit({required ExpenseRepo expenseRepo})
       : _expenseRepo = expenseRepo,
-        super(const ExpensesState());
+        super(const ExpensesState()) {
+    _expenseSubscription = _expenseRepo.expensesStream.listen((expenses) {
+      expenses.doPrint('KIRERR');
+      emit(state.copyWith(expenses: expenses));
+    });
+  }
 
   final ExpenseRepo _expenseRepo;
+  StreamSubscription<List<Expense>>? _expenseSubscription;
 
   Future<void> addExpense(Expense expense, {required Tasker tasker}) async {
     // Local operation.
@@ -79,4 +87,10 @@ class ExpensesCubit extends HydratedCubit<ExpensesState> {
 
   @override
   Map<String, dynamic>? toJson(ExpensesState state) => state.toJson();
+
+  @override
+  Future<void> close() {
+    _expenseSubscription?.cancel();
+    return super.close();
+  }
 }

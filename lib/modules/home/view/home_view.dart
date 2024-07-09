@@ -38,7 +38,8 @@ class HomeView extends StatelessWidget {
                             final statusMsg = state.statusMsg;
                             if (statusMsg != null) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(statusMsg)));
+                                SnackBar(content: Text(statusMsg)),
+                              );
                             }
                           },
                           child: IconButton(
@@ -163,10 +164,15 @@ class HomeView extends StatelessWidget {
                               'Pending:',
                               style: themeData.textTheme.labelMedium,
                             ),
-                            Text(
-                              '0',
-                              style: themeData.textTheme.labelMedium
-                                  ?.copyWith(color: Colors.blue),
+                            BlocSelector<AppCubit, AppState, int>(
+                              selector: (state) => state.tasks.length,
+                              builder: (context, tasksLength) {
+                                return Text(
+                                  tasksLength.toString(),
+                                  style: themeData.textTheme.labelMedium
+                                      ?.copyWith(color: Colors.blue),
+                                );
+                              },
                             ),
                           ],
                         ),

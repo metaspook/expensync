@@ -25,15 +25,13 @@ class ExpenseRepo {
   // Future<List<Todo>> get todoList => _todoListController.stream.first;
 
   Future<void> init() async {
-    final cachedTodoList = <Expense>[];
-
     Future<void> firstInit() async {
+      final cachedTodoList = <Expense>[];
       try {
         final res = await AppWriteHelper().databases.listDocuments(
               collectionId: AppWriteHelper.collectionId,
               databaseId: AppWriteHelper.databaseId,
             );
-        cachedTodoList.clear();
         for (final doc in res.documents) {
           print('HERE: ${doc.data}');
 
@@ -49,7 +47,6 @@ class ExpenseRepo {
           });
           cachedTodoList.add(expense);
         }
-
         _expensesController.add(cachedTodoList);
       } on AppwriteException catch (e) {
         print(e.message);
