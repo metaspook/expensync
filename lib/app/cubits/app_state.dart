@@ -10,6 +10,16 @@ enum AppStatus {
   bool get isLoggedIn => this == AppStatus.loggedIn;
 }
 
+enum SyncStatus {
+  online,
+  offline,
+  syncing;
+  // authenticated,
+  // unauthenticated;
+
+  // bool get isLoggedIn => this == AppStatus.loggedIn;
+}
+
 enum AppLanguage {
   auto('Auto'),
   arabic('عربي'),

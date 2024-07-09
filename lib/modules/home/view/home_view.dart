@@ -73,7 +73,7 @@ class HomeView extends StatelessWidget {
                   ],
                 ),
                 bottom: PreferredSize(
-                  preferredSize: const Size.fromHeight(kToolbarHeight),
+                  preferredSize: const Size.fromHeight(kToolbarHeight * .84),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 15,
@@ -93,9 +93,21 @@ class HomeView extends StatelessWidget {
                             return Row(
                               children: [
                                 if (online)
-                                  const Icon(
-                                    Icons.sync_outlined,
-                                    color: Colors.green,
+                                  StreamBuilder<double>(
+                                    stream: Stream.periodic(
+                                      Durations.extralong4 * 2,
+                                      (count) => count.toDouble(),
+                                    ),
+                                    builder: (context, snapshot) {
+                                      return AnimatedRotation(
+                                        duration: Durations.extralong4,
+                                        turns: snapshot.data ?? 0,
+                                        child: const Icon(
+                                          Icons.sync_outlined,
+                                          color: Colors.green,
+                                        ),
+                                      );
+                                    },
                                   )
                                 else
                                   const Icon(
