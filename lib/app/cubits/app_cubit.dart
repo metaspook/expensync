@@ -47,32 +47,37 @@ class AppCubit extends HydratedCubit<AppState> {
   // late final StreamSubscription<(String?, AppUser)> _userSubscription;
 
   Future<void> onConnection({required bool online}) async {
-    emit(state.copyWith(online: online));
+    emit(state.copyWith(syncStatus: SyncStatus.online));
 
-    // Do Pending tasks
     if (online && state.tasks.isNotEmpty) {
-      print(state.tasks);
+      // Do Pending tasks
+      emit(state.copyWith(syncStatus: SyncStatus.syncing));
       final newTasks = [...state.tasks];
+
+      // await Future.wait(
+      //   state.tasks,
+      //   cleanUp: (successValue) => successValue.doPrint('successValue: '),
+      // );
       for (final task in state.tasks) {
-        await task().then((_) => print('DONE 1'));
-        print('DONE 2');
-        newTasks.remove(task);
+        await task().then((_) => newTasks.remove(task));
       }
-      emit(state.copyWith(tasks: newTasks));
+      emit(state.copyWith(syncStatus: SyncStatus.online, tasks: newTasks));
+    } else if (online) {
+      emit(state.copyWith(syncStatus: SyncStatus.online));
+    } else {
+      emit(state.copyWith(syncStatus: SyncStatus.offline));
     }
   }
 
   Future<void> doTask(Task task) async {
-    print('ONLINE ${state.tasks}');
-    !state.online && !state.tasks.contains(task)
+    final offlineMode =
+        state.syncStatus.isOffline && !state.tasks.contains(task);
+    // state.syncStatus.isOffline.doPrint('OfflineMode: ');
+    offlineMode
+        // Schedule Task
         ? emit(state.copyWith(tasks: [...state.tasks, task]))
         : await task();
   }
-
-  // void addTask(Task task) {
-  //   final newTasks = [...state.tasks, task];
-  //   emit(state.copyWith(tasks: newTasks));
-  // }
 
   void onGetStarted() {
     emit(state.copyWith(firstLaunch: false));

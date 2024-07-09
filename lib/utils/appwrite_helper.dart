@@ -6,10 +6,10 @@ class AppWriteHelper {
 
   static AppWriteHelper? _instance;
 
-  static const endpoint = 'https://192.168.0.106/v1';
-  static const projectId = '66892476003087d25c70';
-  static const databaseId = '668925090008882be343';
-  static const collectionId = '66892528003d8ac1fb5e';
+  static const endpoint = 'https://192.168.0.105/v1';
+  static const projectId = '668ccc81003d9867a4e7';
+  static const databaseId = '668ccd1b0014ff5dfe9d';
+  static const collectionId = '668ccd330033e90a2dfb';
 
   // static const endpoint = 'https://192.168.1.91/v1';
   // static const projectId = '66857df3002e3cf1fb27';

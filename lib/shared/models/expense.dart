@@ -11,7 +11,7 @@ final class Expense extends Equatable {
 
   factory Expense.fromJson(Map<String, dynamic> json) {
     return Expense(
-      id: json['id'] as String,
+      id: json[r'$id'] as String,
       name: json['name'] as String?,
       amount: json['amount'] as num,
       createdAt: json['createdAt'] as String,
@@ -38,7 +38,7 @@ final class Expense extends Equatable {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      r'$id': id,
       'name': name,
       'amount': amount,
       'createdAt': createdAt,

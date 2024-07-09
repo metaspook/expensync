@@ -1,10 +1,10 @@
 part of 'connectivity_cubit.dart';
 
-enum ConnectivityStatus { connected, disconnected, unknown }
+enum ConnectivityStatus { connected, disconnected }
 
 class ConnectivityState extends Equatable {
   const ConnectivityState({
-    this.status = ConnectivityStatus.unknown,
+    this.status = ConnectivityStatus.disconnected,
     this.statusMsg,
   });
   final ConnectivityStatus status;

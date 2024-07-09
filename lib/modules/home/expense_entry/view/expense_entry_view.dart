@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:expensync/app/app.dart';
 import 'package:expensync/modules/home/home.dart';
 import 'package:expensync/shared/models/models.dart';
 import 'package:expensync/utils/app_utils.dart';
@@ -58,6 +59,7 @@ class _ExpenseEntryViewState extends State<ExpenseEntryView> {
   Widget build(BuildContext context) {
     // final themeData = Theme.of(context);
     final cubit = context.read<ExpensesCubit>();
+    final appCubit = context.read<AppCubit>();
 
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -95,8 +97,9 @@ class _ExpenseEntryViewState extends State<ExpenseEntryView> {
             valueListenable: _submitEnabled,
             builder: (context, value, child) => ElevatedButton(
               onPressed: value
-                  ? () {
-                      cubit.addExpense(_expense);
+                  ? () async {
+                      // await cubit.addExpense(_expense);
+                      await cubit.addExpense(_expense, tasker: appCubit.doTask);
                       _clearTextControllers();
                       FocusManager.instance.primaryFocus?.unfocus();
                     }

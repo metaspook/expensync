@@ -11,13 +11,13 @@ enum AppStatus {
 }
 
 enum SyncStatus {
-  online,
   offline,
+  online,
   syncing;
   // authenticated,
   // unauthenticated;
 
-  // bool get isLoggedIn => this == AppStatus.loggedIn;
+  bool get isOffline => this == SyncStatus.offline;
 }
 
 enum AppLanguage {
@@ -35,10 +35,11 @@ final class AppState extends Equatable {
   const AppState({
     // required this.installationId,
     this.status = AppStatus.loggedOut,
+    this.syncStatus = SyncStatus.offline,
     this.statusMsg,
     this.language = AppLanguage.auto,
     // this.user = AppUser.unauthenticated,
-    this.online = false,
+    // this.online = false,
     this.firstLaunch = true,
     this.navIndex = 0,
     this.tasks = const [],
@@ -61,10 +62,11 @@ final class AppState extends Equatable {
 
   // final String installationId;
   final AppStatus status;
+  final SyncStatus syncStatus;
   final String? statusMsg;
   final AppLanguage language;
   // final AppUser user;
-  final bool online;
+  // final bool online;
   final bool firstLaunch;
   final int navIndex;
   final List<Task> tasks;
@@ -79,10 +81,11 @@ final class AppState extends Equatable {
   AppState copyWith({
     String? installationId,
     AppStatus? status,
+    SyncStatus? syncStatus,
     AppLanguage? language,
     String? statusMsg,
     // AppUser? user,
-    bool? online,
+    // bool? online,
     bool? firstLaunch,
     int? navIndex,
     List<Task>? tasks,
@@ -90,10 +93,11 @@ final class AppState extends Equatable {
       AppState(
         // installationId: installationId ?? this.installationId,
         status: status ?? this.status,
+        syncStatus: syncStatus ?? this.syncStatus,
         language: language ?? this.language,
         statusMsg: this.statusMsg,
         // user: user ?? this.user,
-        online: online ?? this.online,
+        // online: online ?? this.online,
         firstLaunch: firstLaunch ?? this.firstLaunch,
         navIndex: navIndex ?? this.navIndex,
         tasks: tasks ?? this.tasks,
@@ -114,10 +118,11 @@ final class AppState extends Equatable {
   List<Object?> get props => [
         // installationId,
         status,
+        syncStatus,
         language,
         statusMsg,
         // user,
-        online,
+        // online,
         firstLaunch,
         navIndex,
         tasks,

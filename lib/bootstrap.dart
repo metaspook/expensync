@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:appwrite/appwrite.dart';
 import 'package:equatable/equatable.dart';
+import 'package:expensync/utils/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart' as hb;
 import 'package:path_provider/path_provider.dart';
 
 class AppBlocObserver extends BlocObserver {
@@ -33,11 +36,20 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
   // Add cross-flavor configuration here
   WidgetsFlutterBinding.ensureInitialized();
   EquatableConfig.stringify = true;
-  HydratedBloc.storage = await HydratedStorage.build(
+  hb.HydratedBloc.storage = await hb.HydratedStorage.build(
     storageDirectory: kIsWeb
-        ? HydratedStorage.webStorageDirectory
+        ? hb.HydratedStorage.webStorageDirectory
         : await getApplicationDocumentsDirectory(),
   );
+  final client = Client();
+  AppWriteHelper().account = Account(client);
+  AppWriteHelper().storage = Storage(client);
+  AppWriteHelper().databases = Databases(client);
+  AppWriteHelper().realtime = Realtime(client);
+  AppWriteHelper().client = client
+      .setEndpoint(AppWriteHelper.endpoint) // Your Appwrite Endpoint
+      .setProject(AppWriteHelper.projectId) // Your project ID
+      .setSelfSigned(); // Use only on dev mode with a self-signed SSL cert
 
   runApp(await builder());
 }

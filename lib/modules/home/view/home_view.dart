@@ -1,5 +1,6 @@
 import 'package:expensync/app/app.dart';
 import 'package:expensync/modules/home/home.dart';
+import 'package:expensync/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -11,7 +12,7 @@ class HomeView extends StatelessWidget {
     final themeData = Theme.of(context);
     final cubit = context.read<HomeCubit>();
     final expensesCubit = context.read<ExpensesCubit>();
-    // final appCubit = context.read<AppCubit>();
+    final appCubit = context.read<AppCubit>();
     // final repo = context.read<TodoRepo>();
     final selectionEnabled =
         context.select((ExpensesCubit cubit) => cubit.state.selectionEnabled);
@@ -32,12 +33,23 @@ class HomeView extends StatelessWidget {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        IconButton(
-                          visualDensity: VisualDensity.compact,
-                          onPressed: selectionEnabled
-                              ? expensesCubit.removeAllSelectedExpense
-                              : null,
-                          icon: const Icon(Icons.delete_forever_rounded),
+                        BlocListener<ExpensesCubit, ExpensesState>(
+                          listener: (context, state) {
+                            final statusMsg = state.statusMsg;
+                            if (statusMsg != null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(statusMsg)));
+                            }
+                          },
+                          child: IconButton(
+                            visualDensity: VisualDensity.compact,
+                            onPressed: selectionEnabled
+                                ? () => expensesCubit.removeAllSelectedExpense(
+                                      tasker: appCubit.doTask,
+                                    )
+                                : null,
+                            icon: const Icon(Icons.delete_forever_rounded),
+                          ),
                         ),
                         IconButton(
                           visualDensity: VisualDensity.compact,
@@ -86,13 +98,38 @@ class HomeView extends StatelessWidget {
                           'Status: ',
                           style: themeData.textTheme.titleMedium,
                         ),
-                        const SizedBox(width: 5),
-                        BlocSelector<AppCubit, AppState, bool>(
-                          selector: (state) => state.online,
-                          builder: (context, online) {
+                        const SizedBox(width: 1),
+                        BlocSelector<AppCubit, AppState, SyncStatus>(
+                          selector: (state) => state.syncStatus,
+                          builder: (context, syncStatus) {
                             return Row(
                               children: [
-                                if (online)
+                                // Offline
+                                [
+                                  const Icon(
+                                    Icons.sync_problem_rounded,
+                                    color: Colors.red,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    'Offline',
+                                    style: themeData.textTheme.titleMedium,
+                                  ),
+                                ],
+                                // Online
+                                [
+                                  const Icon(
+                                    Icons.wifi_rounded,
+                                    color: Colors.green,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    'Online',
+                                    style: themeData.textTheme.titleMedium,
+                                  ),
+                                ],
+                                // Syncing
+                                [
                                   StreamBuilder<double>(
                                     stream: Stream.periodic(
                                       Durations.extralong4 * 2,
@@ -104,22 +141,18 @@ class HomeView extends StatelessWidget {
                                         turns: snapshot.data ?? 0,
                                         child: const Icon(
                                           Icons.sync_outlined,
-                                          color: Colors.green,
+                                          color: Colors.amber,
                                         ),
                                       );
                                     },
-                                  )
-                                else
-                                  const Icon(
-                                    Icons.sync_problem_rounded,
-                                    color: Colors.red,
                                   ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  'Syncing...',
-                                  style: themeData.textTheme.titleMedium,
-                                ),
-                              ],
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    'Syncing...',
+                                    style: themeData.textTheme.titleMedium,
+                                  ),
+                                ],
+                              ][syncStatus.index..doPrint()],
                             );
                           },
                         ),

@@ -9,8 +9,22 @@ part 'connectivity_state.dart';
 class ConnectivityCubit extends Cubit<ConnectivityState> {
   ConnectivityCubit({required Connectivity connectivityRepo})
       : super(const ConnectivityState()) {
+    // connectivityRepo.checkConnectivity().then((results){
+
+    // })
+    //    emit(
+    //   connected
+    //       ? state.copyWith(
+    //           status: ConnectivityStatus.connected,
+    //           statusMsg: 'Internet is connected!',
+    //         )
+    //       : state.copyWith(
+    //           status: ConnectivityStatus.disconnected,
+    //           statusMsg: 'Internet is disconnected!',
+    //         ),
+    // );
+
     // Listen to connectivity changes
-    print('KIRRWE');
     _connectivitySubscription =
         connectivityRepo.onConnectivityChanged.listen((results) {
       print(results);

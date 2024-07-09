@@ -19,7 +19,7 @@ class AppView extends StatelessWidget {
       ),
     );
     return BlocListener<ConnectivityCubit, ConnectivityState>(
-      listenWhen: (previous, current) => previous.status != current.status,
+      // listenWhen: (previous, current) => previous.status != current.status,
       listener: (context, state) => cubit.onConnection(
         online: state.status == ConnectivityStatus.connected,
       ),
