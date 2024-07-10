@@ -2,13 +2,14 @@ import 'dart:async';
 
 // import 'package:connectivator/connectivator.dart';
 import 'package:equatable/equatable.dart';
+import 'package:expensync/shared/repositories/repositories.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 part 'app_state.dart';
 
 class AppCubit extends HydratedCubit<AppState> {
-  AppCubit()
-      :
+  AppCubit({required ExpenseRepo expenseRepo})
+      : _expenseRepo = expenseRepo,
         // _connectivator = Connectivator(),
         super(const AppState()) {
     //-- Initialize Connectivity.
@@ -45,9 +46,13 @@ class AppCubit extends HydratedCubit<AppState> {
   // final Connectivator _connectivator;
   // late final StreamSubscription<(String?, bool)> _connectivitySubscription;
   // late final StreamSubscription<(String?, AppUser)> _userSubscription;
+  final ExpenseRepo _expenseRepo;
 
   Future<void> onConnection({required bool online}) async {
     emit(state.copyWith(syncStatus: SyncStatus.online));
+
+    // Subscribe if get back online
+    if (online) _expenseRepo.streamList.listen(print);
 
     if (online && state.tasks.isNotEmpty) {
       // Do Pending tasks
@@ -99,8 +104,8 @@ class AppCubit extends HydratedCubit<AppState> {
 
   @override
   Future<void> close() {
-    // _userSubscription.cancel();
     // _connectivitySubscription.cancel();
+    _expenseRepo.dispose();
     return super.close();
   }
 }

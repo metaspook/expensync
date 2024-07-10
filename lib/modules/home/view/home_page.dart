@@ -8,20 +8,17 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider(
-      create: (context) => ExpenseRepo()..init(),
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider(
-            create: (context) => HomeCubit(),
-          ),
-          BlocProvider(
-            create: (context) =>
-                ExpensesCubit(expenseRepo: context.read<ExpenseRepo>()),
-          ),
-        ],
-        child: const HomeView(),
-      ),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => HomeCubit(),
+        ),
+        BlocProvider(
+          create: (context) =>
+              ExpensesCubit(expenseRepo: context.read<ExpenseRepo>()),
+        ),
+      ],
+      child: const HomeView(),
     );
   }
 }

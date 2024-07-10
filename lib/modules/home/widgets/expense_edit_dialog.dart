@@ -1,3 +1,4 @@
+import 'package:expensync/app/cubits/app_cubit.dart';
 import 'package:expensync/modules/home/home.dart';
 import 'package:expensync/shared/models/models.dart';
 import 'package:expensync/utils/utils.dart';
@@ -73,6 +74,7 @@ class _ExpenseEditDialogState extends State<ExpenseEditDialog> {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<ExpensesCubit>();
+    final appCubit = context.read<AppCubit>();
     final themeData = Theme.of(context);
 
     return AlertDialog(
@@ -137,7 +139,11 @@ class _ExpenseEditDialogState extends State<ExpenseEditDialog> {
                         Navigator.of(context).pop();
                         final expenseIndex =
                             cubit.state.expenses.indexOf(widget.expense);
-                        cubit.updateExpense(expenseIndex, _expense);
+                        cubit.updateExpense(
+                          expenseIndex,
+                          _expense,
+                          tasker: appCubit.doTask,
+                        );
                         _clearTextControllers();
                       }
                     : null,

@@ -2,6 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:expensync/app/app.dart';
 import 'package:expensync/l10n/l10n.dart';
 import 'package:expensync/modules/home/home.dart';
+import 'package:expensync/shared/repositories/expense_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -19,7 +20,7 @@ class AppView extends StatelessWidget {
       ),
     );
     return BlocListener<ConnectivityCubit, ConnectivityState>(
-      // listenWhen: (previous, current) => previous.status != current.status,
+      listenWhen: (previous, current) => previous.status != current.status,
       listener: (context, state) => cubit.onConnection(
         online: state.status == ConnectivityStatus.connected,
       ),
@@ -50,15 +51,21 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (context) => AppCubit()),
-        BlocProvider(
-          create: (context) =>
-              ConnectivityCubit(connectivityRepo: Connectivity()),
-        ),
-      ],
-      child: const AppView(),
+    return RepositoryProvider(
+      create: (context) => ExpenseRepo(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) =>
+                AppCubit(expenseRepo: context.read<ExpenseRepo>()),
+          ),
+          BlocProvider(
+            create: (context) =>
+                ConnectivityCubit(connectivityRepo: Connectivity()),
+          ),
+        ],
+        child: const AppView(),
+      ),
     );
   }
 }

@@ -10,4 +10,5 @@ class AppUtils {
   static void unfocus() => FocusManager.instance.primaryFocus?.unfocus();
 }
 
+typedef Json = Map<String, dynamic>;
 typedef Tasker = Future<void> Function(Future<Object?> Function() task);

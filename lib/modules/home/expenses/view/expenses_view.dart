@@ -60,16 +60,18 @@ class ExpensesView extends StatelessWidget {
                             '\$${expense.amount}',
                             style: themeData.textTheme.bodyLarge,
                           ),
-                          IconButton(
-                            visualDensity: const VisualDensity(
-                              horizontal: VisualDensity.minimumDensity,
-                              vertical: VisualDensity.minimumDensity,
+                          Flexible(
+                            child: IconButton(
+                              visualDensity: const VisualDensity(
+                                horizontal: VisualDensity.minimumDensity,
+                                vertical: VisualDensity.minimumDensity,
+                              ),
+                              onPressed: selectionEnabled
+                                  ? null
+                                  : () => ExpenseEditDialog(expense)
+                                      .show(context, cubit: cubit),
+                              icon: const Icon(Icons.edit_rounded),
                             ),
-                            onPressed: selectionEnabled
-                                ? null
-                                : () => ExpenseEditDialog(expense)
-                                    .show(context, cubit: cubit),
-                            icon: const Icon(Icons.edit_rounded),
                           ),
                         ],
                       ),

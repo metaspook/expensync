@@ -12,8 +12,7 @@ class ExpensesCubit extends HydratedCubit<ExpensesState> {
   ExpensesCubit({required ExpenseRepo expenseRepo})
       : _expenseRepo = expenseRepo,
         super(const ExpensesState()) {
-    _expenseSubscription = _expenseRepo.expensesStream.listen((expenses) {
-      expenses.doPrint('KIRERR');
+    _expenseSubscription = _expenseRepo.streamList.listen((expenses) {
       emit(state.copyWith(expenses: expenses));
     });
   }
@@ -29,18 +28,32 @@ class ExpensesCubit extends HydratedCubit<ExpensesState> {
         expenses: [...state.expenses, expense],
       ),
     );
+    final expenseJson = {
+      'name': expense.name,
+      'amount': expense.amount,
+      'createdAt': expense.createdAt,
+      'updatedAt': expense.updatedAt,
+    };
     // Remote operation.
-    await tasker(() => _expenseRepo.create(expense));
+    await tasker(() => _expenseRepo.create(expense.id, value: expenseJson));
   }
 
-  // void removeExpense(Expense expense) {
-  //   final newExpenses = [...state.expenses]..remove(expense);
-  //   emit(state.copyWith(expenses: newExpenses));
-  // }
-
-  void updateExpense(int index, Expense expense) {
+  Future<void> updateExpense(
+    int index,
+    Expense expense, {
+    required Tasker tasker,
+  }) async {
+    // Local operation.
     final newExpenses = [...state.expenses]..[index] = expense;
     emit(state.copyWith(expenses: newExpenses));
+    final expenseJson = {
+      'name': expense.name,
+      'amount': expense.amount,
+      'createdAt': expense.createdAt,
+      'updatedAt': expense.updatedAt,
+    };
+    // Remote operation.
+    await tasker(() => _expenseRepo.update(expense.id, value: expenseJson));
   }
 
   void deselectAll() {
@@ -91,6 +104,7 @@ class ExpensesCubit extends HydratedCubit<ExpensesState> {
   @override
   Future<void> close() {
     _expenseSubscription?.cancel();
+    _expenseRepo.dispose();
     return super.close();
   }
 }

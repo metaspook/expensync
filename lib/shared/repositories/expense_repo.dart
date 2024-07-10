@@ -1,167 +1,163 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:expensync/shared/models/models.dart';
 import 'package:expensync/utils/utils.dart';
 
-enum CrudType { create, delete, update, read }
-
-extension RealtimeMessageExt on RealtimeMessage {
-  String get crudEvent => events.first.split('.').last;
-}
-
-class ExpenseRepo {
-  // TodoRepo() {
-  //   _todoListController.add([]);
-  // }
-  CrudType? _crudType;
-  String? _realtimeEvent;
-  RealtimeSubscription? _realtimeSubscription;
-  final _realtime = AppWriteHelper().realtime;
-
-  final _expensesController = StreamController<List<Expense>>.broadcast();
-  Stream<List<Expense>> get expensesStream => _expensesController.stream;
-  // Future<List<Todo>> get todoList => _todoListController.stream.first;
-
-  Future<void> init() async {
-    Future<void> firstInit() async {
-      final cachedTodoList = <Expense>[];
-      try {
-        final res = await AppWriteHelper().databases.listDocuments(
-              collectionId: AppWriteHelper.collectionId,
-              databaseId: AppWriteHelper.databaseId,
-            );
-        for (final doc in res.documents) {
-          print('HERE: ${doc.data}');
-
-          final docMap = Map<String, Object?>.from(
-            jsonDecode(doc.data['expense'] as String) as Map,
-          );
-          final expense = Expense.fromJson({
-            r'$id': doc.data[r'$id'],
-            'name': docMap['name'],
-            'amount': docMap['amount'],
-            'createdAt': docMap['createdAt'],
-            'updatedAt': docMap['updatedAt'],
-          });
-          cachedTodoList.add(expense);
-        }
-        _expensesController.add(cachedTodoList);
-      } on AppwriteException catch (e) {
-        print(e.message);
-      }
-    }
-
-    // First time init
-    await firstInit();
-    const channels = [
-      'databases.${AppWriteHelper.databaseId}.collections.${AppWriteHelper.collectionId}.documents',
-    ];
-    // Subscription
-    try {
-      _realtimeSubscription = _realtime.subscribe(channels)
-        ..stream.listen((data) async {
-          print('EVENT::: ${data.crudEvent}');
-          await firstInit();
-        });
-    } on AppwriteException catch (e) {
-      print(e.message);
-    }
-  }
-
-  Future<bool> create(Expense expense) async {
-    final dateTimeStr = AppUtils.dateTimeStr;
-    final expenseJsonStr = jsonEncode({
-      'name': expense.name,
-      'amount': expense.amount,
-      'createdAt': expense.createdAt,
-      'updatedAt': expense.updatedAt,
-    });
-    try {
-      // final document = await AppWriteHelper().databases.createDocument(
-      AppWriteHelper().databases
-        ..createDocument(
-          databaseId: ID.custom(AppWriteHelper.databaseId),
-          collectionId: ID.custom(
-            AppWriteHelper.collectionId,
-          ), //change your collection id
-          documentId: expense.id,
-          data: {'expense': expenseJsonStr},
-          permissions: [
-            Permission.read(Role.any()),
-            Permission.write(Role.any()),
-          ],
-        ).then((_) {
-          _crudType = CrudType.create;
-          print('HILL::');
-          return true;
-        });
-
-      // print(document.toMap());
-      // emit(state.copyWith(status: TodosStatus.success));
-    } on AppwriteException catch (e) {
-      print(e.message);
-    }
-    return false;
-  }
-
-  Future<bool> delete(String expenseId) async {
-    // final todoList = await todoListStream.first;
-    try {
-      await AppWriteHelper()
-          .databases
-          .deleteDocument(
-            databaseId: ID.custom(AppWriteHelper.databaseId),
-            collectionId: ID.custom(AppWriteHelper.collectionId),
-            documentId: expenseId,
-          )
-          .then((_) {
-        // cachedTodoList.remove(value)
-        _crudType = CrudType.delete;
-        return true;
-      });
-      // return true;
-    } on AppwriteException catch (e) {
-      print(e.message);
-    }
-    return false;
-  }
-
-  Future<bool> update(Expense expense) async {
-    final expenseJsonStr = jsonEncode({
-      'name': expense.name,
-      'createdAt': expense.createdAt,
-      'updatedAt': expense.updatedAt,
-    });
-    try {
-      // final document = await AppWriteHelper().databases.createDocument(
-      await AppWriteHelper().databases.updateDocument(
-        databaseId: ID.custom(AppWriteHelper.databaseId),
-        collectionId: ID.custom(
-          AppWriteHelper.collectionId,
-        ),
-        documentId: expense.id,
-        data: {'expense': expenseJsonStr},
-        permissions: [
-          Permission.read(Role.any()),
-          Permission.write(Role.any()),
-        ],
-      ).then((_) {
-        _crudType = CrudType.update;
-        return true;
-      });
-
-      // print(document.toMap());
-      // emit(state.copyWith(status: TodosStatus.success));
-    } on AppwriteException catch (e) {
-      print(e.message);
-    }
-    return false;
-  }
-
+class ExpenseRepo implements CRUD<Json, Expense> {
   void dispose() {
     _realtimeSubscription?.close();
     _expensesController.close();
+  }
+
+  //-- Config
+  final _cacheExpenses = <Expense>[];
+  final _channels = const [
+    'databases.${AppWriteHelper.databaseId}.collections.${AppWriteHelper.collectionId}.documents',
+  ];
+
+  RealtimeSubscription? _realtimeSubscription;
+
+  final _expensesController = StreamController<List<Expense>>.broadcast();
+  Stream<List<Expense>> get expenses2Stream => _expensesController.stream;
+
+  final _db = AppWriteHelper().databases;
+  final _realtime = AppWriteHelper().realtime;
+  final _errorMsgNotFound = 'Expenses not found!';
+  final _errorMsg = "Couldn't get the Expenses!";
+  final _errorMsgCreate = "Couldn't create the Expense!";
+  final _errorMsgRead = "Couldn't read the Expense data!";
+  final _errorMsgUpdate = "Couldn't update the Expenses!";
+  final _errorMsgDelete = "Couldn't delete the Expenses!";
+
+  Future<(String?, List<Expense>)> readAll() async {
+    try {
+      final res = await _db.listDocuments(
+        collectionId: AppWriteHelper.collectionId,
+        databaseId: AppWriteHelper.databaseId,
+      );
+      _cacheExpenses.clear();
+      for (final doc in res.documents) {
+        final docMap = Map<String, Object?>.from(
+          jsonDecode(doc.data['expense'] as String) as Map,
+        );
+        final expense = Expense.fromJson({
+          r'$id': doc.data[r'$id'],
+          'name': docMap['name'],
+          'amount': docMap['amount'],
+          'createdAt': docMap['createdAt'],
+          'updatedAt': docMap['updatedAt'],
+        });
+        _cacheExpenses.add(expense);
+      }
+    } on AppwriteException catch (e, s) {
+      log(_errorMsgNotFound, error: e, stackTrace: s);
+      return (_errorMsgNotFound, _cacheExpenses);
+    }
+    return (null, _cacheExpenses);
+  }
+
+  Stream<List<Expense>> get streamList async* {
+    final (errorMsg, expenses) = await readAll();
+    if (errorMsg != null) {
+      yield expenses;
+    }
+    _realtime.subscribe(_channels).stream.listen((data) {
+      final expenseMap = jsonDecode(data.payload['expense'] as String) as Map;
+      expenseMap.doPrint('EXPENSEMAP: ');
+    });
+  }
+
+  // void subscribe() {
+  //   // Subscription
+  //   try {
+  //     _realtimeSubscription?.close();
+  //     _realtimeSubscription = _realtime.subscribe(_channels)
+  //       ..stream.listen((data) async {
+  //         data.crudEvent.doPrint('EVENT::: ');
+  //         _cacheExpenses.doPrint('EXPENSES CACHE: ');
+
+  //         if (data.crudEvent == AppWriteCrudEvent.update) {
+  //           'Updated : ${data.payload}'.doPrint();
+  //           '${data.payload['expense']}'.doPrint('REMOTE UPDATED OBJ: ');
+
+  //           for (final cachedExpense in _cacheExpenses) {
+  //             if (cachedExpense.id == data.payload[r'$id']) {
+  //               'Exist in Local'.doPrint();
+  //               final dateTime1 = DateTime.parse(cachedExpense.updatedAt);
+  //               final dateTime2 = DateTime.parse(
+  //                 (jsonDecode(data.payload['expense'] as String)
+  //                     as Map)['updatedAt'] as String,
+  //               );
+  //               if (dateTime1.compareTo(dateTime2) > 0) {
+  //                 'Local is Latest'.doPrint();
+  //               }
+  //               break;
+  //             }
+  //           }
+  //         }
+
+  //         await readAll();
+  //       });
+  //   } on AppwriteException catch (e) {
+  //     print(e.message);
+  //   }
+  // }
+
+  @override
+  Future<String?> create(String id, {required Json value}) async {
+    try {
+      await _db.createDocument(
+        databaseId: ID.custom(AppWriteHelper.databaseId),
+        collectionId: ID.custom(AppWriteHelper.collectionId),
+        documentId: id,
+        permissions: AppWriteHelper.permissions,
+        data: {'expense': jsonEncode(value)},
+      );
+    } on AppwriteException catch (e, s) {
+      log(_errorMsgCreate, error: e, stackTrace: s);
+      return _errorMsgCreate;
+    }
+    return null;
+  }
+
+  @override
+  Future<String?> delete(String id) async {
+    try {
+      await _db.deleteDocument(
+        databaseId: ID.custom(AppWriteHelper.databaseId),
+        collectionId: ID.custom(AppWriteHelper.collectionId),
+        documentId: id,
+      );
+    } on AppwriteException catch (e, s) {
+      log(_errorMsgDelete, error: e, stackTrace: s);
+      return _errorMsgDelete;
+    }
+    return null;
+  }
+
+  @override
+  Future<String?> update(String id, {required Json value}) async {
+    try {
+      await _db.updateDocument(
+        databaseId: ID.custom(AppWriteHelper.databaseId),
+        collectionId: ID.custom(AppWriteHelper.collectionId),
+        documentId: id,
+        permissions: AppWriteHelper.permissions,
+        data: {'expense': jsonEncode(value)},
+      );
+    } on AppwriteException catch (e, s) {
+      log(_errorMsgUpdate, error: e, stackTrace: s);
+      return _errorMsgUpdate;
+    }
+    return null;
+  }
+
+  @override
+  Future<(String?, Expense)> read(String id) {
+    // TODO: implement read
+    throw UnimplementedError();
   }
 }

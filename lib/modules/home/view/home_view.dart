@@ -1,6 +1,5 @@
 import 'package:expensync/app/app.dart';
 import 'package:expensync/modules/home/home.dart';
-import 'package:expensync/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -10,6 +9,7 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
+    final size = MediaQuery.of(context).size;
     final cubit = context.read<HomeCubit>();
     final expensesCubit = context.read<ExpensesCubit>();
     final appCubit = context.read<AppCubit>();
@@ -63,30 +63,25 @@ class HomeView extends StatelessWidget {
                       ],
                     ),
                 ],
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                title: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Expensync',
-                          style: themeData.textTheme.titleLarge,
-                        ),
-                        Text(
-                          'Minimal Expense Manager',
-                          style: themeData.textTheme.titleSmall?.copyWith(
-                            color: themeData.textTheme.titleSmall?.color
-                                ?.withOpacity(.5),
-                          ),
-                        ),
-                      ],
+                    Text(
+                      'Expensync',
+                      style: themeData.textTheme.titleLarge,
+                    ),
+                    Text(
+                      'Minimal Expense Manager',
+                      style: themeData.textTheme.titleSmall?.copyWith(
+                        color: themeData.textTheme.titleSmall?.color
+                            ?.withOpacity(.5),
+                      ),
                     ),
                   ],
                 ),
                 bottom: PreferredSize(
-                  preferredSize: const Size.fromHeight(kToolbarHeight * .84),
+                  preferredSize: const Size.fromHeight(kToolbarHeight),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 15,
@@ -153,7 +148,7 @@ class HomeView extends StatelessWidget {
                                     style: themeData.textTheme.titleMedium,
                                   ),
                                 ],
-                              ][syncStatus.index..doPrint()],
+                              ][syncStatus.index],
                             );
                           },
                         ),
