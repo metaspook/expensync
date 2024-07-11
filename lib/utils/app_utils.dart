@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 
 class AppUtils {
   static String get uuid => const Uuid().v4();
+  // genUUID()
 
   /// Current UTC DateTime.
   static DateTime get dateTime => DateTime.now().toUtc();
