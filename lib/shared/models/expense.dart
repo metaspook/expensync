@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:expensync/shared/services/database.dart';
 
 final class Expense extends Equatable {
   const Expense({
@@ -16,6 +17,16 @@ final class Expense extends Equatable {
       amount: json['amount'] as double,
       createdAt: json['createdAt'] as DateTime,
       updatedAt: json['updatedAt'] as DateTime,
+    );
+  }
+
+  factory Expense.fromData(ExpenseData data) {
+    return Expense(
+      id: data.id,
+      name: data.name,
+      amount: data.amount,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
     );
   }
 

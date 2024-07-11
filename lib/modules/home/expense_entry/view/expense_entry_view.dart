@@ -1,4 +1,3 @@
-import 'package:appwrite/appwrite.dart';
 import 'package:expensync/app/app.dart';
 import 'package:expensync/modules/home/home.dart';
 import 'package:expensync/shared/models/models.dart';
@@ -22,7 +21,7 @@ class _ExpenseEntryViewState extends State<ExpenseEntryView> {
   Expense get _expense {
     final dateTime = AppUtils.dateTime;
     return Expense(
-      id: ID.unique(),
+      id: AppUtils.uuid,
       name: _nameController.text.trim(),
       amount: double.parse(_amountController.text.trim()),
       createdAt: dateTime,
@@ -99,7 +98,7 @@ class _ExpenseEntryViewState extends State<ExpenseEntryView> {
               onPressed: value
                   ? () async {
                       // await cubit.addExpense(_expense);
-                      await cubit.addExpense(_expense, tasker: appCubit.doTask);
+                      await cubit.addExpense(_expense);
                       _clearTextControllers();
                       FocusManager.instance.primaryFocus?.unfocus();
                     }

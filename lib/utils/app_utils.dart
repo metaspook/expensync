@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 class AppUtils {
+  static String get uuid => const Uuid().v4();
+
   /// Current UTC DateTime.
   static DateTime get dateTime => DateTime.now().toUtc();
 

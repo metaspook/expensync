@@ -2,7 +2,8 @@ import 'dart:async';
 
 // import 'package:connectivator/connectivator.dart';
 import 'package:equatable/equatable.dart';
-import 'package:expensync/shared/repositories/repositories.dart';
+import 'package:expensync/shared/repositories/expense_repo.dart';
+import 'package:expensync/shared/services/electric_service.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 part 'app_state.dart';
@@ -42,6 +43,15 @@ class AppCubit extends HydratedCubit<AppState> {
     // });
   }
 
+  final electricService = ElectricService.instance;
+
+  Future<void> connect() async {
+    if (electricService.electricClient != null &&
+        !electricService.electricClient!.isConnected) {
+      await electricService.connect();
+    }
+  }
+
   // bool _connected = false;
   // final Connectivator _connectivator;
   // late final StreamSubscription<(String?, bool)> _connectivitySubscription;
@@ -49,40 +59,45 @@ class AppCubit extends HydratedCubit<AppState> {
   final ExpenseRepo _expenseRepo;
 
   Future<void> onConnection({required bool online}) async {
-    emit(state.copyWith(syncStatus: SyncStatus.online));
-
-    // Subscribe if get back online
-    if (online) _expenseRepo.streamList.listen(print);
-
-    if (online && state.tasks.isNotEmpty) {
-      // Do Pending tasks
-      emit(state.copyWith(syncStatus: SyncStatus.syncing));
-      final newTasks = [...state.tasks];
-
-      // await Future.wait(
-      //   state.tasks,
-      //   cleanUp: (successValue) => successValue.doPrint('successValue: '),
-      // );
-      for (final task in state.tasks) {
-        await task().then((_) => newTasks.remove(task));
-      }
-      emit(state.copyWith(syncStatus: SyncStatus.online, tasks: newTasks));
-    } else if (online) {
+    if (online) {
+      await connect();
       emit(state.copyWith(syncStatus: SyncStatus.online));
     } else {
       emit(state.copyWith(syncStatus: SyncStatus.offline));
     }
+
+    // Subscribe if get back online
+    // if (online) _expenseRepo.streamList.listen(print);
+
+    // if (online && state.tasks.isNotEmpty) {
+    //   // Do Pending tasks
+    //   emit(state.copyWith(syncStatus: SyncStatus.syncing));
+    //   final newTasks = [...state.tasks];
+
+    //   // await Future.wait(
+    //   //   state.tasks,
+    //   //   cleanUp: (successValue) => successValue.doPrint('successValue: '),
+    //   // );
+    //   // for (final task in state.tasks) {
+    //   //   await task().then((_) => newTasks.remove(task));
+    //   // }
+    //   emit(state.copyWith(syncStatus: SyncStatus.online, tasks: newTasks));
+    // } else if (online) {
+    //   emit(state.copyWith(syncStatus: SyncStatus.online));
+    // } else {
+    //   emit(state.copyWith(syncStatus: SyncStatus.offline));
+    // }
   }
 
-  Future<void> doTask(Task task) async {
-    final offlineMode =
-        state.syncStatus.isOffline && !state.tasks.contains(task);
-    // state.syncStatus.isOffline.doPrint('OfflineMode: ');
-    offlineMode
-        // Schedule Task
-        ? emit(state.copyWith(tasks: [...state.tasks, task]))
-        : await task();
-  }
+  // Future<void> doTask(Task task) async {
+  //   final offlineMode =
+  //       state.syncStatus.isOffline && !state.tasks.contains(task);
+  //   // state.syncStatus.isOffline.doPrint('OfflineMode: ');
+  //   offlineMode
+  //       // Schedule Task
+  //       ? emit(state.copyWith(tasks: [...state.tasks, task]))
+  //       : await task();
+  // }
 
   void onGetStarted() {
     emit(state.copyWith(firstLaunch: false));
@@ -105,7 +120,7 @@ class AppCubit extends HydratedCubit<AppState> {
   @override
   Future<void> close() {
     // _connectivitySubscription.cancel();
-    _expenseRepo.dispose();
+    // _expenseRepo.dispose();
     return super.close();
   }
 }

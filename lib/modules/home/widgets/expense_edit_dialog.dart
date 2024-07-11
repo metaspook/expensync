@@ -142,7 +142,6 @@ class _ExpenseEditDialogState extends State<ExpenseEditDialog> {
                         cubit.updateExpense(
                           expenseIndex,
                           _expense,
-                          tasker: appCubit.doTask,
                         );
                         _clearTextControllers();
                       }

@@ -45,9 +45,7 @@ class HomeView extends StatelessWidget {
                           child: IconButton(
                             visualDensity: VisualDensity.compact,
                             onPressed: selectionEnabled
-                                ? () => expensesCubit.removeAllSelectedExpense(
-                                      tasker: appCubit.doTask,
-                                    )
+                                ? expensesCubit.removeAllSelectedExpense
                                 : null,
                             icon: const Icon(Icons.delete_forever_rounded),
                           ),

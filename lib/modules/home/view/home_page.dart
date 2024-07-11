@@ -1,5 +1,7 @@
+import 'package:expensync/app/cubits/connectivity/connectivity_cubit.dart'
+    as bloc;
 import 'package:expensync/modules/home/home.dart';
-import 'package:expensync/shared/repositories/repositories.dart';
+import 'package:expensync/shared/repositories/expense_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -18,7 +20,13 @@ class HomePage extends StatelessWidget {
               ExpensesCubit(expenseRepo: context.read<ExpenseRepo>()),
         ),
       ],
-      child: const HomeView(),
+      child: BlocListener<bloc.ConnectivityCubit, bloc.ConnectivityState>(
+        listenWhen: (previous, current) => previous.status != current.status,
+        listener: (context, state) async {
+          context.read<ExpensesCubit>().syncTable();
+        },
+        child: const HomeView(),
+      ),
     );
   }
 }

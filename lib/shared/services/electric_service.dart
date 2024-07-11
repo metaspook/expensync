@@ -32,6 +32,7 @@ class ElectricService {
         db: _database,
         migrations: kElectricMigrations,
         config: ElectricConfig(
+          // timeout: ,
           url: _electricURL,
           logger: LoggerConfig(level: Level.debug, colored: true),
         ),

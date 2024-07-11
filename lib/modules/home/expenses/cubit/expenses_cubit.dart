@@ -1,14 +1,16 @@
 import 'dart:async';
 
+import 'package:drift/drift.dart';
 import 'package:equatable/equatable.dart';
 import 'package:expensync/shared/models/models.dart';
-import 'package:expensync/shared/repositories/repositories.dart';
-import 'package:expensync/utils/utils.dart';
+import 'package:expensync/shared/repositories/expense_repo.dart';
+import 'package:expensync/shared/services/database.dart';
+import 'package:expensync/shared/services/electric_service.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 part 'expenses_state.dart';
 
-class ExpensesCubit extends HydratedCubit<ExpensesState> {
+class ExpensesCubit extends Cubit<ExpensesState> {
   ExpensesCubit({required ExpenseRepo expenseRepo})
       : _expenseRepo = expenseRepo,
         super(const ExpensesState()) {
@@ -18,51 +20,59 @@ class ExpensesCubit extends HydratedCubit<ExpensesState> {
   }
 
   final ExpenseRepo _expenseRepo;
+  final client = ElectricService.instance.electricClient;
   StreamSubscription<List<Expense>>? _expensesSubscription;
 
-  Future<void> addExpense(Expense expense, {required Tasker tasker}) async {
-    // Local operation.
-    emit(
-      state.copyWith(
-        statusMsg: 'New Expense Added!',
-        expenses: [...state.expenses, expense],
-      ),
-    );
-    final expenseJson = {
-      'name': expense.name,
-      'amount': expense.amount,
-      'createdAt': expense.createdAt,
-      'updatedAt': expense.updatedAt,
-    };
-    // Remote operation.
-    await tasker(() => _expenseRepo.create(expense.id, value: expenseJson));
+  Future<void> syncTable() async {
+    if (client != null && client!.isConnected) {
+      await client!.syncTable(client!.db.expense);
+    }
   }
 
-  Future<void> updateExpense(
-    int index,
-    Expense expense, {
-    required Tasker tasker,
-  }) async {
-    // Local operation.
-    final newExpenses = [...state.expenses]..[index] = expense;
-    emit(state.copyWith(expenses: newExpenses));
-    final expenseJson = {
-      'name': expense.name,
-      'amount': expense.amount,
-      'createdAt': expense.createdAt,
-      'updatedAt': expense.updatedAt,
-    };
-    // Remote operation.
-    await tasker(() => _expenseRepo.update(expense.id, value: expenseJson));
+  Future<void> addExpense(Expense expense) async {
+    final expenseCompanion = ExpenseCompanion.insert(
+      id: expense.id,
+      name: Value(expense.name),
+      amount: expense.amount,
+      createdAt: expense.createdAt,
+      updatedAt: expense.updatedAt,
+    );
+    final errorMsg =
+        await _expenseRepo.create(expense.id, value: expenseCompanion);
+    emit(
+      errorMsg == null
+          ? state.copyWith(
+              statusMsg: 'New Expense Added!',
+              expenses: [...state.expenses, expense],
+            )
+          : state.copyWith(statusMsg: errorMsg),
+    );
+  }
+
+  Future<void> updateExpense(int index, Expense expense) async {
+    final expenseCompanion = ExpenseCompanion(
+      name: Value(expense.name),
+      amount: Value(expense.amount),
+      createdAt: Value(expense.createdAt),
+      updatedAt: Value(expense.updatedAt),
+    );
+    final errorMsg =
+        await _expenseRepo.update(expense.id, value: expenseCompanion);
+    emit(
+      errorMsg == null
+          ? state.copyWith(
+              statusMsg: 'Expense Updated!',
+              expenses: [...state.expenses, expense],
+            )
+          : state.copyWith(statusMsg: errorMsg),
+    );
   }
 
   void deselectAll() {
     emit(state.copyWith(selectedExpenses: []));
   }
 
-  Future<void> removeAllSelectedExpense({
-    required Tasker tasker,
-  }) async {
+  Future<void> removeAllSelectedExpense() async {
     final prevSelectedExpenses = [...state.selectedExpenses];
     // Local operation.
     final newExpenses = [...state.expenses];
@@ -78,7 +88,7 @@ class ExpensesCubit extends HydratedCubit<ExpensesState> {
     );
     // Remote operation.
     for (final expense in prevSelectedExpenses) {
-      await tasker(() => _expenseRepo.delete(expense.id));
+      await _expenseRepo.delete(expense.id);
     }
   }
 
@@ -91,20 +101,12 @@ class ExpensesCubit extends HydratedCubit<ExpensesState> {
           : state
               .copyWith(selectedExpenses: [...state.selectedExpenses, expense]),
     );
-    print(state.selectedExpenses);
   }
-
-  @override
-  ExpensesState? fromJson(Map<String, dynamic> json) =>
-      ExpensesState.fromJson(json);
-
-  @override
-  Map<String, dynamic>? toJson(ExpensesState state) => state.toJson();
 
   @override
   Future<void> close() {
     _expensesSubscription?.cancel();
-    _expenseRepo.dispose();
+    // _expenseRepo.dispose();
     return super.close();
   }
 }
