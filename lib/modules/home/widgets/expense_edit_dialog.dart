@@ -31,11 +31,11 @@ class _ExpenseEditDialogState extends State<ExpenseEditDialog> {
   late final Listenable _listenable;
 
   Expense get _expense {
-    final dateTimeStr = AppUtils.dateTimeStr;
+    final dateTime = AppUtils.dateTime;
     return widget.expense.copyWith(
       name: _nameController.text.trim(),
-      amount: num.parse(_amountController.text.trim()),
-      updatedAt: dateTimeStr,
+      amount: double.parse(_amountController.text.trim()),
+      updatedAt: dateTime,
     );
   }
 

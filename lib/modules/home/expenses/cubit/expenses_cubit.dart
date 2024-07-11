@@ -12,13 +12,13 @@ class ExpensesCubit extends HydratedCubit<ExpensesState> {
   ExpensesCubit({required ExpenseRepo expenseRepo})
       : _expenseRepo = expenseRepo,
         super(const ExpensesState()) {
-    _expenseSubscription = _expenseRepo.streamList.listen((expenses) {
+    _expensesSubscription = _expenseRepo.streamList.listen((expenses) {
       emit(state.copyWith(expenses: expenses));
     });
   }
 
   final ExpenseRepo _expenseRepo;
-  StreamSubscription<List<Expense>>? _expenseSubscription;
+  StreamSubscription<List<Expense>>? _expensesSubscription;
 
   Future<void> addExpense(Expense expense, {required Tasker tasker}) async {
     // Local operation.
@@ -103,7 +103,7 @@ class ExpensesCubit extends HydratedCubit<ExpensesState> {
 
   @override
   Future<void> close() {
-    _expenseSubscription?.cancel();
+    _expensesSubscription?.cancel();
     _expenseRepo.dispose();
     return super.close();
   }

@@ -88,7 +88,7 @@ class ExpensesView extends StatelessWidget {
                               text: 'Created: ',
                               children: [
                                 TextSpan(
-                                  text: expense.createdAt,
+                                  text: expense.createdAt.toString(),
                                   style:
                                       themeData.textTheme.labelSmall?.copyWith(
                                     fontWeight: FontWeight.normal,
@@ -106,7 +106,7 @@ class ExpensesView extends StatelessWidget {
                               text: 'Updated: ',
                               children: [
                                 TextSpan(
-                                  text: expense.updatedAt,
+                                  text: expense.updatedAt.toString(),
                                   style:
                                       themeData.textTheme.labelSmall?.copyWith(
                                     fontWeight: FontWeight.normal,

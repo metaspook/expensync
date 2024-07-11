@@ -13,17 +13,17 @@ final class Expense extends Equatable {
     return Expense(
       id: json[r'$id'] as String,
       name: json['name'] as String?,
-      amount: json['amount'] as num,
-      createdAt: json['createdAt'] as String,
-      updatedAt: json['updatedAt'] as String,
+      amount: json['amount'] as double,
+      createdAt: json['createdAt'] as DateTime,
+      updatedAt: json['updatedAt'] as DateTime,
     );
   }
 
   final String id;
   final String? name;
-  final num amount;
-  final String createdAt;
-  final String updatedAt;
+  final double amount;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   @override
   List<Object?> get props {
@@ -49,9 +49,9 @@ final class Expense extends Equatable {
   Expense copyWith({
     String? id,
     String? name,
-    num? amount,
-    String? createdAt,
-    String? updatedAt,
+    double? amount,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return Expense(
       id: id ?? this.id,

@@ -20,13 +20,13 @@ class _ExpenseEntryViewState extends State<ExpenseEntryView> {
   late final Listenable _listenable;
 
   Expense get _expense {
-    final dateTimeStr = AppUtils.dateTimeStr;
+    final dateTime = AppUtils.dateTime;
     return Expense(
       id: ID.unique(),
       name: _nameController.text.trim(),
-      amount: num.parse(_amountController.text.trim()),
-      createdAt: dateTimeStr,
-      updatedAt: dateTimeStr,
+      amount: double.parse(_amountController.text.trim()),
+      createdAt: dateTime,
+      updatedAt: dateTime,
     );
   }
 
