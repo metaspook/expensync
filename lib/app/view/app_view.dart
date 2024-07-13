@@ -53,8 +53,15 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider(
-      create: (context) => ExpenseRepo(),
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(
+          create: (context) => ExpenseRepo(),
+        ),
+        RepositoryProvider(
+          create: (context) => Connectivity(),
+        ),
+      ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
@@ -62,8 +69,9 @@ class App extends StatelessWidget {
                 AppCubit(expenseRepo: context.read<ExpenseRepo>()),
           ),
           BlocProvider(
-            create: (context) =>
-                ConnectivityCubit(connectivityRepo: Connectivity()),
+            create: (context) => ConnectivityCubit(
+              connectivityRepo: context.read<Connectivity>(),
+            ),
           ),
         ],
         child: const AppView(),

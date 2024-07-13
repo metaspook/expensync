@@ -23,6 +23,6 @@ const kPostgresMigrations = <Migration>[
       '        CREATE OR REPLACE FUNCTION delete_public_expense_into_oplog_function()\n        RETURNS TRIGGER AS \$\$\n        BEGIN\n          DECLARE\n            flag_value INTEGER;\n          BEGIN\n            -- Get the flag value from _electric_trigger_settings\n            SELECT flag INTO flag_value FROM "public"._electric_trigger_settings WHERE namespace = \'public\' AND tablename = \'expense\';\n    \n            IF flag_value = 1 THEN\n              -- Insert into _electric_oplog\n              INSERT INTO "public"._electric_oplog (namespace, tablename, optype, "primaryKey", "newRow", "oldRow", timestamp)\n              VALUES (\n                \'public\',\n                \'expense\',\n                \'DELETE\',\n                json_strip_nulls(json_build_object(\'id\', old."id")),\n                NULL,\n                jsonb_build_object(\'amount\', cast(old."amount" as TEXT), \'createdAt\', old."createdAt", \'id\', old."id", \'name\', old."name", \'updatedAt\', old."updatedAt"),\n                NULL\n              );\n            END IF;\n    \n            RETURN NEW;\n          END;\n        END;\n        \$\$ LANGUAGE plpgsql;\n      ',
       '        CREATE TRIGGER delete_public_expense_into_oplog\n          AFTER DELETE ON "public"."expense"\n            FOR EACH ROW\n              EXECUTE FUNCTION delete_public_expense_into_oplog_function();\n      ',
     ],
-    version: '20240711113700',
+    version: '20240713123905',
   )
 ];

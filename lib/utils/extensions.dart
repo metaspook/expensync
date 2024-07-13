@@ -1,4 +1,12 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
+
+extension ConnectivityResultsExt on List<ConnectivityResult> {
+  bool get isConnected =>
+      contains(ConnectivityResult.mobile) ||
+      contains(ConnectivityResult.wifi) ||
+      contains(ConnectivityResult.ethernet);
+}
 
 extension NullableObjectExt on Object? {
   /// A string representation of this object.

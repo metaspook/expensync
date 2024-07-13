@@ -9,20 +9,14 @@ part 'database.g.dart';
 @DriftDatabase(tables: kElectrifiedTables)
 class AppDatabase extends _$AppDatabase {
   factory AppDatabase() => _instance ??= AppDatabase._();
-  AppDatabase._() : super(_openConnection());
+  AppDatabase._() : super(multi_platform.openConnection());
   static AppDatabase? _instance;
 
   @override
   int get schemaVersion => 1;
 
+  // empty callback to prevent drift from creating the tables in the local
+  // database, as this is done automatically by Electric.
   @override
-  MigrationStrategy get migration {
-    return MigrationStrategy(
-      onCreate: (m) async {},
-    );
-  }
-}
-
-QueryExecutor _openConnection() {
-  return multi_platform.connectOn();
+  MigrationStrategy get migration => MigrationStrategy(onCreate: (_) async {});
 }

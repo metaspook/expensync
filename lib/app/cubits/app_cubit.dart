@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:expensync/shared/repositories/expense_repo.dart';
 import 'package:expensync/shared/services/electric_service.dart';
+import 'package:expensync/utils/utils.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 part 'app_state.dart';
@@ -43,12 +44,11 @@ class AppCubit extends HydratedCubit<AppState> {
     // });
   }
 
-  final electricService = ElectricService.instance;
+  final electricService = ElectricService();
 
   Future<void> connect() async {
-    if (electricService.electricClient != null &&
-        !electricService.electricClient!.isConnected) {
-      await electricService.connect();
+    if (!electricService.client.isConnected) {
+      await electricService.client.connect(authToken());
     }
   }
 

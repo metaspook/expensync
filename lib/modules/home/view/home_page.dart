@@ -1,3 +1,5 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:expensync/app/app.dart';
 import 'package:expensync/app/cubits/connectivity/connectivity_cubit.dart'
     as bloc;
 import 'package:expensync/modules/home/home.dart';
@@ -16,14 +18,18 @@ class HomePage extends StatelessWidget {
           create: (context) => HomeCubit(),
         ),
         BlocProvider(
-          create: (context) =>
-              ExpensesCubit(expenseRepo: context.read<ExpenseRepo>()),
+          create: (context) => ExpensesCubit(
+            expenseRepo: context.read<ExpenseRepo>(),
+            connectivityRepo: context.read<Connectivity>(),
+          ),
         ),
       ],
       child: BlocListener<bloc.ConnectivityCubit, bloc.ConnectivityState>(
         listenWhen: (previous, current) => previous.status != current.status,
         listener: (context, state) async {
-          context.read<ExpensesCubit>().syncTable();
+          if (state.status == ConnectivityStatus.connected) {
+            await context.read<ExpensesCubit>().syncTable();
+          }
         },
         child: const HomeView(),
       ),

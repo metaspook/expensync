@@ -1,31 +1,41 @@
 import 'dart:async';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:drift/drift.dart';
 import 'package:equatable/equatable.dart';
 import 'package:expensync/shared/models/models.dart';
 import 'package:expensync/shared/repositories/expense_repo.dart';
 import 'package:expensync/shared/services/database.dart';
 import 'package:expensync/shared/services/electric_service.dart';
+import 'package:expensync/utils/extensions.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 part 'expenses_state.dart';
 
 class ExpensesCubit extends Cubit<ExpensesState> {
-  ExpensesCubit({required ExpenseRepo expenseRepo})
-      : _expenseRepo = expenseRepo,
+  ExpensesCubit({
+    required ExpenseRepo expenseRepo,
+    required Connectivity connectivityRepo,
+  })  : _expenseRepo = expenseRepo,
         super(const ExpensesState()) {
+    //  connectivityRepo
+    connectivityRepo.onConnectivityChanged.listen((results) async {
+      if (results.isConnected) await syncTable();
+    });
+
     _expensesSubscription = _expenseRepo.streamList.listen((expenses) {
       emit(state.copyWith(expenses: expenses));
     });
   }
 
   final ExpenseRepo _expenseRepo;
-  final client = ElectricService.instance.electricClient;
+  final client = ElectricService().client;
   StreamSubscription<List<Expense>>? _expensesSubscription;
+  StreamSubscription<bool>? _connectivitySubscription;
 
   Future<void> syncTable() async {
-    if (client != null && client!.isConnected) {
-      await client!.syncTable(client!.db.expense);
+    if (client.isConnected) {
+      await client.syncTable(client.db.expense);
     }
   }
 
@@ -106,6 +116,7 @@ class ExpensesCubit extends Cubit<ExpensesState> {
   @override
   Future<void> close() {
     _expensesSubscription?.cancel();
+    _connectivitySubscription?.cancel();
     // _expenseRepo.dispose();
     return super.close();
   }

@@ -1,6 +1,6 @@
 -- migrate:up
 -- With this we can customize the id of the migration in Electric
-CALL electric.migration_version('20240711113700');
+CALL electric.migration_version('20240713123905');
 
 CREATE TABLE expense (
     "id" TEXT NOT NULL,

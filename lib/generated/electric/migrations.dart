@@ -19,6 +19,6 @@ const kSqliteMigrations = <Migration>[
       'DROP TRIGGER IF EXISTS delete_main_expense_into_oplog;',
       'CREATE TRIGGER delete_main_expense_into_oplog\n  AFTER DELETE ON "main"."expense"\n  WHEN 1 = (SELECT flag from _electric_trigger_settings WHERE namespace = \'main\' AND tablename = \'expense\')\nBEGIN\n  INSERT INTO _electric_oplog (namespace, tablename, optype, primaryKey, newRow, oldRow, timestamp)\n  VALUES (\'main\', \'expense\', \'DELETE\', json_patch(\'{}\', json_object(\'id\', old."id")), NULL, json_object(\'amount\', cast(old."amount" as TEXT), \'createdAt\', old."createdAt", \'id\', old."id", \'name\', old."name", \'updatedAt\', old."updatedAt"), NULL);\nEND;',
     ],
-    version: '20240711113700',
+    version: '20240713123905',
   )
 ];
