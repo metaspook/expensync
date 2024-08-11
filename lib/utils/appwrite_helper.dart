@@ -3,7 +3,6 @@ import 'package:appwrite/appwrite.dart';
 class AppWriteHelper {
   factory AppWriteHelper() => _instance ??= AppWriteHelper._();
   AppWriteHelper._();
-
   static AppWriteHelper? _instance;
 
   static const endpoint = 'https://192.168.0.106/v1';
