@@ -49,73 +49,73 @@ class ExpensesView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(expense.name ?? 'N/A'),
+                          Text(expense.description ?? 'N/A'),
                         ],
                       ),
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            '\$${expense.amount}',
-                            style: themeData.textTheme.bodyLarge,
-                          ),
-                          IconButton(
-                            visualDensity: const VisualDensity(
-                              horizontal: VisualDensity.minimumDensity,
-                              vertical: VisualDensity.minimumDensity,
-                            ),
-                            onPressed: selectionEnabled
-                                ? null
-                                : () => ExpenseEditDialog(expense)
-                                    .show(context, cubit: cubit),
-                            icon: const Icon(Icons.edit_rounded),
-                          ),
-                        ],
-                      ),
+                      // trailing: Column(
+                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //   crossAxisAlignment: CrossAxisAlignment.end,
+                      //   children: [
+                      //     Text(
+                      //       '\$${expense.amount}',
+                      //       style: themeData.textTheme.bodyLarge,
+                      //     ),
+                      //     IconButton(
+                      //       visualDensity: const VisualDensity(
+                      //         horizontal: VisualDensity.minimumDensity,
+                      //         vertical: VisualDensity.minimumDensity,
+                      //       ),
+                      //       onPressed: selectionEnabled
+                      //           ? null
+                      //           : () => ExpenseEditDialog(expense)
+                      //               .show(context, cubit: cubit),
+                      //       icon: const Icon(Icons.edit_rounded),
+                      //     ),
+                      //   ],
+                      // ),
                       // isThreeLine: true,
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text.rich(
-                            style: themeData.textTheme.labelSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                            TextSpan(
-                              text: 'Created: ',
-                              children: [
-                                TextSpan(
-                                  text: expense.createdAt,
-                                  style:
-                                      themeData.textTheme.labelSmall?.copyWith(
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                  children: const [],
-                                ),
-                              ],
-                            ),
-                          ),
-                          Text.rich(
-                            style: themeData.textTheme.labelSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                            TextSpan(
-                              text: 'Updated: ',
-                              children: [
-                                TextSpan(
-                                  text: expense.updatedAt,
-                                  style:
-                                      themeData.textTheme.labelSmall?.copyWith(
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                  children: const [],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                      // subtitle: Column(
+                      //   crossAxisAlignment: CrossAxisAlignment.start,
+                      //   mainAxisSize: MainAxisSize.min,
+                      //   children: [
+                      //     Text.rich(
+                      //       style: themeData.textTheme.labelSmall?.copyWith(
+                      //         fontWeight: FontWeight.bold,
+                      //       ),
+                      //       TextSpan(
+                      //         text: 'Created: ',
+                      //         children: [
+                      //           TextSpan(
+                      //             text: expense.createdAt,
+                      //             style:
+                      //                 themeData.textTheme.labelSmall?.copyWith(
+                      //               fontWeight: FontWeight.normal,
+                      //             ),
+                      //             children: const [],
+                      //           ),
+                      //         ],
+                      //       ),
+                      //     ),
+                      //     Text.rich(
+                      //       style: themeData.textTheme.labelSmall?.copyWith(
+                      //         fontWeight: FontWeight.bold,
+                      //       ),
+                      //       TextSpan(
+                      //         text: 'Updated: ',
+                      //         children: [
+                      //           TextSpan(
+                      //             text: expense.updatedAt,
+                      //             style:
+                      //                 themeData.textTheme.labelSmall?.copyWith(
+                      //               fontWeight: FontWeight.normal,
+                      //             ),
+                      //             children: const [],
+                      //           ),
+                      //         ],
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
                     ),
                   );
                 },

@@ -1,7 +1,6 @@
-import 'package:appwrite/appwrite.dart';
 import 'package:expensync/modules/home/home.dart';
 import 'package:expensync/shared/models/models.dart';
-import 'package:expensync/utils/app_utils.dart';
+import 'package:expensync/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -18,14 +17,15 @@ class _ExpenseEntryViewState extends State<ExpenseEntryView> {
   final _submitEnabled = ValueNotifier<bool>(false);
   late final Listenable _listenable;
 
-  Expense get _expense {
-    final dateTimeStr = AppUtils.dateTimeStr;
-    return Expense(
-      id: ID.unique(),
-      name: _nameController.text.trim(),
-      amount: num.parse(_amountController.text.trim()),
-      createdAt: dateTimeStr,
-      updatedAt: dateTimeStr,
+  Todo get _expense {
+    // final dateTimeStr = AppUtils.dateTimeStr;
+    return Todo(
+      id: uuid(),
+      ownerId: uuid(),
+      description: _nameController.text.trim(),
+      // amount: num.parse(_amountController.text.trim()),
+      // createdAt: dateTimeStr,
+      // updatedAt: dateTimeStr,
     );
   }
 
@@ -35,21 +35,24 @@ class _ExpenseEntryViewState extends State<ExpenseEntryView> {
   }
 
   void _onTextChanged() {
-    _submitEnabled.value =
-        _nameController.text.isNotEmpty && _amountController.text.isNotEmpty;
+    _submitEnabled.value = _nameController.text.isNotEmpty;
   }
 
   @override
   void initState() {
     super.initState();
-    _listenable = Listenable.merge([_nameController, _amountController])
+    _listenable = Listenable.merge([
+      _nameController,
+
+      // _amountController
+    ])
       ..addListener(_onTextChanged);
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _amountController.dispose();
+    // _amountController.dispose();
     _listenable.removeListener(_onTextChanged);
     super.dispose();
   }
@@ -73,15 +76,15 @@ class _ExpenseEntryViewState extends State<ExpenseEntryView> {
         ),
         const SizedBox(height: 20),
         // Amount Field
-        TextField(
-          keyboardType: TextInputType.number,
-          controller: _amountController,
-          decoration: InputDecoration(
-            label: const Text('Amount'),
-            border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(12.5)),
-          ),
-        ),
+        // TextField(
+        //   keyboardType: TextInputType.number,
+        //   controller: _amountController,
+        //   decoration: InputDecoration(
+        //     label: const Text('Amount'),
+        //     border:
+        //         OutlineInputBorder(borderRadius: BorderRadius.circular(12.5)),
+        //   ),
+        // ),
         const SizedBox(height: 20),
         BlocListener<ExpensesCubit, ExpensesState>(
           listener: (context, state) {

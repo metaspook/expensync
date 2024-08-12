@@ -10,9 +10,9 @@ class ExpenseReportView extends StatelessWidget {
     final themeData = Theme.of(context);
     final expenses =
         context.select((ExpensesCubit cubit) => cubit.state.expenses);
-    final total = expenses.isEmpty
-        ? 0
-        : expenses.map((e) => e.amount).reduce((v, e) => v + e);
+    // final total = expenses.isEmpty
+    //     ? 0
+    //     : expenses.map((e) => e.amount).reduce((v, e) => v + e);
 
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -27,13 +27,13 @@ class ExpenseReportView extends StatelessWidget {
                 // decoration: TextDecoration.underline,
               ),
             ),
-            Text(
-              'Total: $total',
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                // decoration: TextDecoration.underline,
-              ),
-            ),
+            // Text(
+            //   'Total: $total',
+            //   style: const TextStyle(
+            //     fontWeight: FontWeight.w500,
+            //     // decoration: TextDecoration.underline,
+            //   ),
+            // ),
           ],
         ),
         const Divider(thickness: 2),
@@ -49,8 +49,8 @@ class ExpenseReportView extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(expenses[i].name ?? 'N/A'),
-                Text(expenses[i].amount.toString()),
+                Text(expenses[i].description ?? 'N/A'),
+                // Text(expenses[i].amount.toString()),
               ],
             ),
       ],

@@ -1,12 +1,11 @@
 import 'package:expensync/modules/home/home.dart';
 import 'package:expensync/shared/models/models.dart';
-import 'package:expensync/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ExpenseEditDialog extends StatefulWidget {
   const ExpenseEditDialog(this.expense, {super.key});
-  final Expense expense;
+  final Todo expense;
 
   void show<T>(BuildContext context, {required ExpensesCubit cubit}) {
     showDialog<T>(
@@ -25,27 +24,28 @@ class ExpenseEditDialog extends StatefulWidget {
 
 class _ExpenseEditDialogState extends State<ExpenseEditDialog> {
   final _nameController = TextEditingController();
-  final _amountController = TextEditingController();
+  // final _amountController = TextEditingController();
   final _submitEnabled = ValueNotifier<bool>(false);
   late final Listenable _listenable;
 
-  Expense get _expense {
-    final dateTimeStr = AppUtils.dateTimeStr;
+  Todo get _expense {
+    // final dateTimeStr = AppUtils.dateTimeStr;
     return widget.expense.copyWith(
-      name: _nameController.text.trim(),
-      amount: num.parse(_amountController.text.trim()),
-      updatedAt: dateTimeStr,
+      description: _nameController.text.trim(),
+      // amount: num.parse(_amountController.text.trim()),
+      // updatedAt: dateTimeStr,
     );
   }
 
   void _clearTextControllers() {
     _nameController.clear();
-    _amountController.clear();
+    // _amountController.clear();
   }
 
   void _onTextChanged() {
-    _submitEnabled.value = _nameController.text != widget.expense.name ||
-        _amountController.text != widget.expense.amount.toString();
+    _submitEnabled.value = _nameController.text != widget.expense.description;
+    //  ||
+    // _amountController.text != widget.expense.amount.toString();
   }
 
   @override
@@ -54,8 +54,8 @@ class _ExpenseEditDialogState extends State<ExpenseEditDialog> {
 
     _listenable = Listenable.merge(
       [
-        _nameController..text = widget.expense.name ?? '',
-        _amountController..text = widget.expense.amount.toString(),
+        _nameController..text = widget.expense.description ?? '',
+        // _amountController..text = widget.expense.amount.toString(),
       ],
     )..addListener(_onTextChanged);
     //  _nameController..text = widget.expense.name ?? '',
@@ -65,7 +65,7 @@ class _ExpenseEditDialogState extends State<ExpenseEditDialog> {
   @override
   void dispose() {
     _nameController.dispose();
-    _amountController.dispose();
+    // _amountController.dispose();
     _listenable.removeListener(_onTextChanged);
     super.dispose();
   }
@@ -107,15 +107,15 @@ class _ExpenseEditDialogState extends State<ExpenseEditDialog> {
           ),
           const SizedBox(height: 20),
           // Amount Field
-          TextField(
-            keyboardType: TextInputType.number,
-            controller: _amountController,
-            decoration: InputDecoration(
-              label: const Text('Amount'),
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(12.5)),
-            ),
-          ),
+          // TextField(
+          //   keyboardType: TextInputType.number,
+          //   controller: _amountController,
+          //   decoration: InputDecoration(
+          //     label: const Text('Amount'),
+          //     border:
+          //         OutlineInputBorder(borderRadius: BorderRadius.circular(12.5)),
+          //   ),
+          // ),
         ],
       ),
       actions: [
