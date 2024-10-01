@@ -1,6 +1,5 @@
 import 'package:expensync/modules/home/home.dart';
 import 'package:expensync/shared/models/models.dart';
-import 'package:expensync/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -30,7 +29,7 @@ class _ExpenseEditDialogState extends State<ExpenseEditDialog> {
   late final Listenable _listenable;
 
   Expense get _expense {
-    final dateTimeStr = AppUtils.dateTimeStr;
+    final dateTimeStr = DateTime.timestamp().toString();
     return widget.expense.copyWith(
       name: _nameController.text.trim(),
       amount: num.parse(_amountController.text.trim()),

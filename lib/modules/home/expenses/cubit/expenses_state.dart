@@ -6,8 +6,8 @@ enum ExpensesStatus {
   success,
   failure;
 
-  const ExpensesStatus();
-  bool get isLoading => this == ExpensesStatus.loading;
+  bool get isLoading => this == loading;
+  bool get isSuccess => this == success;
 }
 
 class ExpensesState extends Equatable {

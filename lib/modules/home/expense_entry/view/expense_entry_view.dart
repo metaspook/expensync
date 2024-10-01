@@ -1,7 +1,6 @@
-import 'package:appwrite/appwrite.dart';
 import 'package:expensync/modules/home/home.dart';
 import 'package:expensync/shared/models/models.dart';
-import 'package:expensync/utils/app_utils.dart';
+import 'package:expensync/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -19,9 +18,9 @@ class _ExpenseEntryViewState extends State<ExpenseEntryView> {
   late final Listenable _listenable;
 
   Expense get _expense {
-    final dateTimeStr = AppUtils.dateTimeStr;
+    final dateTimeStr = DateTime.timestamp().toString();
     return Expense(
-      id: ID.unique(),
+      id: uuid(),
       name: _nameController.text.trim(),
       amount: num.parse(_amountController.text.trim()),
       createdAt: dateTimeStr,
